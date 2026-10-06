@@ -1,0 +1,52 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+}
+
+.container {
+    max-width: 700px;
+    margin: 80px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 10px;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    gap: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+}
+
+button {
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+#messages {
+    margin-top: 20px;
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #f1f1f1;
+    border-radius: 5px;
+}
+
+.message.error {
+    background: #ffe8e8;
+    color: #9f1d1d;
+}

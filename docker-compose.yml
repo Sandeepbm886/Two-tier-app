@@ -1,0 +1,20 @@
+services:
+
+  app:
+    build: .
+    container_name: devops-app
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/devopsapp
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:7.0.34-jammy
+    container_name: devops-mongodb
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
