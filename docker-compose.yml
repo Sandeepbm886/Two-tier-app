@@ -6,15 +6,19 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MONGO_URI: mongodb://mongodb:27017/devopsapp
+      POSTGRES_URI: postgres://postgres:postgres@postgres:5432/devopsapp
     depends_on:
-      - mongodb
+      - postgres
 
-  mongodb:
-    image: mongo:7.0.34-jammy
-    container_name: devops-mongodb
+  postgres:
+    image: postgres:17-alpine
+    container_name: devops-postgres
+    environment:
+      POSTGRES_DB: devopsapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     volumes:
-      - mongodb-data:/data/db
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  mongodb-data:
+  postgres-data:

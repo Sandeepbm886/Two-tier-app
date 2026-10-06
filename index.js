@@ -1,36 +1,14 @@
 import express from "express";
-import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from 'dotenv'
-import Message from "./models/message.js";
+import { initializeDatabase, testConnection } from "./models/message.js";
 import messageRoutes from "./routes/messageRoutes.route.js";
 
 dotenv.config()
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-const MONGO_DB = process.env.MONGO_DB || "devopsapp";
-const MONGO_HOST = process.env.MONGO_HOST || "localhost";
-const MONGO_PORT = process.env.MONGO_PORT || "27017";
-const MONGO_AUTH_SOURCE = process.env.MONGO_AUTH_SOURCE || "admin";
-
-function getMongoUri() {
-    if (process.env.MONGO_URI) {
-        return process.env.MONGO_URI;
-    }
-
-    if (process.env.MONGO_USERNAME && process.env.MONGO_PASSWORD) {
-        const username = encodeURIComponent(process.env.MONGO_USERNAME);
-        const password = encodeURIComponent(process.env.MONGO_PASSWORD);
-
-        return `mongodb://${username}:${password}@${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}?authSource=${MONGO_AUTH_SOURCE}`;
-    }
-
-    return `mongodb://${MONGO_HOST}:${MONGO_PORT}/${MONGO_DB}`;
-}
-
-const MONGO_URI = getMongoUri();
 
 // Required for __dirname with ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -53,26 +31,19 @@ app.get("/health", (req, res) => {
     });
 });
 
-// Connect to MongoDB
-mongoose
-    .connect(MONGO_URI)
+// Connect to PostgreSQL
+initializeDatabase()
     .then(async () => {
-        await Message.findOne().lean();
+        await testConnection();
 
-        console.log("Connected to MongoDB");
+        console.log("Connected to PostgreSQL");
 
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
         });
     })
     .catch((error) => {
-        console.error("MongoDB connection failed:", error);
-
-        if (error?.codeName === "Unauthorized") {
-            console.error(
-                "MongoDB requires authentication. Set MONGO_URI, or set MONGO_USERNAME and MONGO_PASSWORD."
-            );
-        }
+        console.error("PostgreSQL connection failed:", error);
 
         process.exit(1);
     });

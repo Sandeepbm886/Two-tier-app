@@ -1,12 +1,12 @@
 import express from "express";
-import Message from "../models/message.js";
+import { createMessage, findMessages } from "../models/message.js";
 
 const router = express.Router();
 
 // Get all messages
 router.get("/", async (req, res) => {
     try {
-        const messages = await Message.find().sort({ createdAt: -1 });
+        const messages = await findMessages();
 
         res.json(messages);
     } catch (error) {
@@ -23,15 +23,13 @@ router.post("/", async (req, res) => {
     try {
         const { message } = req.body;
 
-        if (!message) {
+        if (!message?.trim()) {
             return res.status(400).json({
                 error: "Message is required",
             });
         }
 
-        const newMessage = await Message.create({
-            message,
-        });
+        const newMessage = await createMessage(message);
 
         res.status(201).json(newMessage);
     } catch (error) {
