@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      POSTGRES_URI: postgres://postgres:postgres@postgres:5432/devopsapp
+      POSTGRES_URI: ${POSTGRES_URI:-postgres://postgres:postgres@postgres:5432/devopsapp}
     depends_on:
       - postgres
 
@@ -14,11 +14,16 @@ services:
     image: postgres:17-alpine
     container_name: devops-postgres
     environment:
-      POSTGRES_DB: devopsapp
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-devopsapp}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d devopsapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres-data:
