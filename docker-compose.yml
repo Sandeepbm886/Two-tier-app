@@ -1,7 +1,7 @@
 services:
 
   app:
-    build: sandeepbm886/two-tire-app-express-postgress:latest
+    image: sandeepbm886/two-tire-app-express-postgress:latest
     container_name: devops-app
     ports:
       - "3000:3000"
