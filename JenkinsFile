@@ -1,0 +1,42 @@
+pipeline {
+    agent none
+
+    stages {
+        stage('Checkout Code') {
+            agent { label 'built-in' } 
+            steps {
+                git branch: 'main', 
+                credentialsId: 'github-tocken', 
+                url: 'https://github.com/Sandeepbm886/Two-tier-app.git'
+
+                stash name: 'compose-file', includes: 'docker-compose.yml'
+                }
+        }
+        
+        stage('Build and Push') {
+            agent { label 'built-in' }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'a19bd62e-8705-46a6-8464-e107cbfdb9c2', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
+                    
+                    sh "echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin"
+                    
+                    sh "docker build -t sandeepbm886/two-tire-app-express-postgress:latest ."
+                    
+                    sh "docker push sandeepbm886/two-tire-app-express-postgress:latest"
+                }
+            }
+        }
+        
+        stage('Deploy to App Instance') {
+            agent { label 'app-instance' }
+            steps {
+                dir('/home/ubuntu/app') {
+                    unstash 'compose-file'
+                    sh "docker compose up -d --pull always"
+
+                    sh "docker image prune -f"
+                }
+            }
+        }
+    }
+}
